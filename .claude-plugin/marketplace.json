@@ -1,0 +1,11 @@
+{
+  "name": "idea-enhancer",
+  "owner": { "name": "Sarvesh" },
+  "plugins": [
+    {
+      "name": "idea-enhancer",
+      "source": "./",
+      "description": "Idea Enhancer & Value Maximiser: research, connect, monetize and validate any idea."
+    }
+  ]
+}
