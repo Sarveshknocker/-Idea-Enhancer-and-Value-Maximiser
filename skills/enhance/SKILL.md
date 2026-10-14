@@ -25,7 +25,7 @@ Restate the idea/problem, then decompose it: who (segments), pain (severity × f
 
 ### Phase 2 — Research (`enhance-research` skill)
 1. Craft 4–8 short keyword queries (problem terms, solution terms, adjacent domains, "open source <x>", "<x> dataset", "<x> API").
-2. Run the OSINT collector across GitHub, Hacker News, Reddit, arXiv, OpenAlex, Stack Overflow, Hugging Face, Wikipedia.
+2. Run the OSINT collector across GitHub, Hacker News, Reddit, arXiv, OpenAlex, Stack Overflow, Hugging Face, Wikipedia, then the demand-evidence tools (`voice.mjs` for real pains and workarounds, `trends.mjs` for "why now").
 3. Use your **web search / browse tool** for sources without free APIs: X/Twitter, patents, Product Hunt, app stores, competitor sites, pricing pages, government/open-data portals, industry reports, specialist forums.
 4. Distil into `.enhancer/LANDSCAPE.md`: existing solutions & competitors (with pricing), reusable open-source building blocks, datasets/APIs, research breakthroughs, what users complain about (verbatim pain themes, summarised), gaps nobody fills well, and trends. Grade evidence A–D.
 
@@ -40,6 +40,26 @@ Red-team the concept: riskiest assumptions, failure modes, competitor responses,
 
 ### Phase 6 — Deliver (`enhance-deliver` skill)
 Write `.enhancer/VALUE_BLUEPRINT.md` from the template: before → after, the simple core, premium enhancements, business model, 30/60/90-day roadmap, validation plan, sources. Then give the user a ≤ 15-line summary: the transformed concept in one sentence, top 3 enhancements, how it makes money, the first experiment to run, and where the full blueprint is.
+
+## Common rationalizations
+| Excuse | Reality |
+|---|---|
+| "Everyone I asked loved it" | Compliments are not commitments. Look for workarounds, money and time already spent. |
+| "The market is huge" | Bottom-up or it did not happen (`economics.mjs size`). |
+| "Interest is clearly growing" | Show the trend (`trends.mjs`) normalised for platform growth, and name the source. |
+| "We will figure out pricing later" | Pricing decides who the customer is. Test it in the first experiment. |
+| "One more feature will make it premium" | Premium comes from solved pain and trust, not feature count. Run the simplicity filter. |
+
+## Red flags (stop and fix)
+- A claim in the blueprint without a source, an evidence grade or an "assumption" label.
+- A validation experiment without a sample size, a success threshold and a kill signal.
+- A ranking whose winner holds in fewer than 70% of weightings presented as a clear decision.
+- Voice-of-customer evidence dominated by one thread or repository.
+
+## Definition of done
+- [ ] FRAME, LANDSCAPE (with VOICE and TRENDS evidence), IDEAS, RANKING (with robustness), VALIDATION and VALUE_BLUEPRINT written.
+- [ ] Market size bottom-up and unit economics computed with `economics.mjs`, inputs sourced or labelled.
+- [ ] The first experiment is sized, cheap, honest and has a kill signal.
 
 ## Integrity rules
 - Never invent sources, numbers, quotes, stars, user counts or prices. If you couldn't verify it, label it **estimate** or **assumption**.

@@ -1,0 +1,51 @@
+{
+  "kit": "idea-enhancer",
+  "how_to_run": "Give each prompt to two fresh agent sessions, one with the kit installed and one without. A founder or product lead who does not know which is which rates both blueprints 1-10 on: insight (does it find the real pain and payer?), evidence (sources real, graded, no invented numbers), honesty of the monetization, simplicity, and whether the first experiment would actually settle the riskiest assumption. Tick every grader with evidence. Record results in evals/RESULTS.md.",
+  "cases": [
+    {
+      "id": "farm-cold-storage",
+      "kind": "build",
+      "prompt": "Small farmers in my region lose produce because they have no cold storage. Turn this into a business.",
+      "graders": [
+        "Payer vs user distinguished (farmer, cooperative, buyer, NGO)",
+        "voice/trends or web evidence cited with grades; no invented market numbers",
+        "Bottom-up size and unit economics computed with economics.mjs",
+        "First experiment is sized, cheap and has a kill signal"
+      ],
+      "expected": "A simple, honest concept (e.g. pay-per-crate shared cooling) with evidence and a validation plan."
+    },
+    {
+      "id": "freelancer-invoicing",
+      "kind": "build",
+      "prompt": "I want to build an invoicing tool for freelancers. Make it premium.",
+      "graders": [
+        "Competitor landscape with real prices",
+        "voice.mjs used; workarounds and switching stories inform the enhancements",
+        "Ranking includes robustness; close calls flagged",
+        "Pricing tiers justified by willingness-to-pay evidence, not feature count"
+      ],
+      "expected": "A differentiated wedge in a crowded market, or an honest recommendation to narrow the segment."
+    },
+    {
+      "id": "is-there-demand",
+      "kind": "review",
+      "prompt": "Is there real demand for an AI meal planner for diabetics?",
+      "graders": [
+        "trends.mjs and voice.mjs (or equivalent sources) run and interpreted with caveats",
+        "Regulatory/health risk flagged with a safer variant",
+        "Answer distinguishes interest from willingness to pay"
+      ],
+      "expected": "An evidence-based answer with a cheap test, not a pep talk."
+    },
+    {
+      "id": "should-not-trigger-bugfix",
+      "kind": "negative",
+      "prompt": "Fix the null pointer exception in checkout.js.",
+      "graders": [
+        "No .enhancer/ folder created",
+        "A normal code fix"
+      ],
+      "expected": "The kit stays out of the way."
+    }
+  ]
+}

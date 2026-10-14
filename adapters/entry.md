@@ -16,4 +16,4 @@ Scripts are dependency-free Node ≥ 18: run them with your terminal tool; use y
 
 **Mode: autonomous.** One message with an idea → a finished `.enhancer/VALUE_BLUEPRINT.md`: frame → research → connect → maximise value → stress-test → deliver. Record assumptions instead of asking; ask only if the input has no identifiable problem.
 
-Always: cite real sources (never invent numbers or links), keep the core solution simple, make monetization honest, and research topics — not private individuals.
+Always: compute market size, unit economics and experiment sizes with `{{KIT}}/skills/enhance-value/scripts/economics.mjs`; cite real sources (never invent numbers or links), keep the core solution simple, make monetization honest, and research topics — not private individuals.

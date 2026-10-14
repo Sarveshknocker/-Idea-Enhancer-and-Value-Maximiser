@@ -1,13 +1,49 @@
 {
   "name": "idea-enhancer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": "github:Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser",
   "description": "Turns any idea or problem into a premium, highly monetizable concept using open-source intelligence, cross-domain creativity and value engineering — for any AI coding assistant.",
   "type": "module",
-  "bin": { "idea-enhancer": "bin/enhancer.mjs" },
-  "files": ["bin", "skills", "agents", "adapters", ".claude-plugin", "README.md", "LICENSE"],
-  "engines": { "node": ">=18" },
-  "scripts": { "test": "node tests/run.mjs", "test:live": "node tests/run.mjs --live" },
-  "keywords": ["ideation", "innovation", "osint", "business-model", "monetization", "triz", "ai-agents", "agents-md", "claude-code", "cursor", "copilot", "codex"],
+  "bin": {
+    "idea-enhancer": "bin/enhancer.mjs"
+  },
+  "files": [
+    "bin",
+    "skills",
+    "agents",
+    "adapters",
+    ".claude-plugin",
+    "README.md",
+    "LICENSE",
+    ".codex-plugin",
+    ".agents",
+    "evals"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "test:live": "node tests/run.mjs --live"
+  },
+  "keywords": [
+    "ideation",
+    "innovation",
+    "osint",
+    "business-model",
+    "monetization",
+    "triz",
+    "ai-agents",
+    "agents-md",
+    "claude-code",
+    "cursor",
+    "copilot",
+    "codex",
+    "customer-research",
+    "pricing",
+    "market-sizing",
+    "product-market-fit",
+    "agent-skills"
+  ],
   "license": "MIT"
 }

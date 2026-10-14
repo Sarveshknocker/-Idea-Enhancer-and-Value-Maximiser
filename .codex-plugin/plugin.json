@@ -1,0 +1,35 @@
+{
+  "name": "idea-enhancer",
+  "version": "0.2.0",
+  "description": "Turn any idea into a validated, monetizable concept with real demand evidence.",
+  "author": {
+    "name": "Sarvesh",
+    "url": "https://github.com/Sarveshknocker"
+  },
+  "homepage": "https://github.com/Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser",
+  "repository": "https://github.com/Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser",
+  "license": "MIT",
+  "keywords": [
+    "ideation",
+    "innovation",
+    "osint",
+    "business-model",
+    "monetization",
+    "strategy"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Idea Enhancer",
+    "shortDescription": "Research, enhance, price and validate any idea with evidence.",
+    "longDescription": "Frames the real problem, researches open sources, mines real customer pains and workarounds, measures demand trends, connects ideas across domains, sizes the market bottom-up, computes unit economics and price ranges, ranks enhancements with a robustness check, and designs cheap, honest, correctly sized validation experiments.",
+    "developerName": "Sarvesh",
+    "category": "Productivity",
+    "capabilities": [],
+    "websiteURL": "https://github.com/Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser",
+    "defaultPrompt": [
+      "Enhance this idea into a premium, monetizable concept.",
+      "Is there real demand for this? Show me evidence.",
+      "Size the market and the first validation experiment."
+    ]
+  }
+}

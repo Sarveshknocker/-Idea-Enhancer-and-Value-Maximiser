@@ -24,5 +24,14 @@ Data protection (GDPR, India DPDP, CCPA), sector rules (finance, health, food, d
 |---|---|---|---|---|---|
 Experiment types: problem interviews (10–15 people), landing page + pricing test, concierge/Wizard-of-Oz MVP, pre-orders / paid pilot, fake-door feature test, partner LOIs, prototype usability test, data feasibility spike.
 
+Size every quantitative experiment before running it, so the threshold means something:
+```bash
+node <kit>/skills/enhance-value/scripts/economics.mjs experiment --expected 0.06 --threshold 0.03 --traffic-per-day 300   # smoke test / landing page
+node <kit>/skills/enhance-value/scripts/economics.mjs experiment --baseline 0.02 --target 0.04                         # A/B: visitors per arm
+node <kit>/skills/enhance-value/scripts/economics.mjs pmf --very 42 --somewhat 35 --not 23                            # Sean Ellis PMF survey, with interval
+```
+**Interviews that tell the truth**: ask about what people did last time the problem happened (what they tried, what it cost them, what they paid for), not whether they would like your idea. Compliments and "I would use that" are not evidence; time, money or reputation they commit (a pilot, a pre-order, an introduction) is. Talk to the segment that feels the pain most, and write down the exact words they use.
+Fake-door and smoke tests must be honest: say the product is coming, never take payment for something that does not exist without a clear refund and delivery promise.
+
 ## 6. Revise
 Update the concept, ranking and roadmap with what the stress-test changed. Record the changes in `.enhancer/VALIDATION.md`.

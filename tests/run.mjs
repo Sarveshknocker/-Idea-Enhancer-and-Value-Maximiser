@@ -155,6 +155,144 @@ test('every skill has valid frontmatter and referenced files exist', () => {
   }
 });
 
+// ---------------------------------------------------------------- v0.2: demand evidence, economics, robustness
+const T = await import('../skills/enhance-research/scripts/trends.mjs');
+const V = await import('../skills/enhance-research/scripts/voice.mjs');
+const E = await import('../skills/enhance-value/scripts/economics.mjs');
+const { robustness } = await import('../skills/enhance-value/scripts/score.mjs');
+const http = await import('node:http');
+const { spawn } = await import('node:child_process');
+const nodeAsync = (args, opts = {}) => new Promise((resolve) => {
+  const c = spawn(process.execPath, args, { cwd: opts.cwd, env: { ...process.env, ...(opts.env ?? {}) } });
+  let stdout = ''; let stderr = '';
+  c.stdout.on('data', (d) => { stdout += d; }); c.stderr.on('data', (d) => { stderr += d; });
+  c.on('close', (status) => resolve({ status, stdout, stderr }));
+});
+
+test('trends: CAGR, direction labels, sparkline', () => {
+  assert.equal(Math.round(T.cagr({ 2020: 100, 2021: 1, 2022: 1, 2023: 800 }) * 100), 100, '100 → 800 over 3 years = +100%/yr');
+  assert.equal(T.cagr({ 2022: 0, 2023: 0, 2024: 0, 2025: 5 }), Infinity);
+  assert.equal(T.cagr({ 2024: 1, 2025: 2 }), null);
+  assert.deepEqual([0.3, 0.1, 0, -0.1, -0.5, null, Infinity].map(T.direction), ['surging', 'growing', 'flat', 'declining', 'collapsing', 'not enough data', 'emerging (from zero)']);
+  assert.equal(T.sparkline([1, 2, 3, 8]), '▁▂▃█');
+});
+
+test('trends CLI: five sources, Stack Overflow/GitHub growth normalised by site totals, phrase search', async () => {
+  const end = new Date().getUTCFullYear() - 1; const seen = [];
+  const yearOf = (u) => { const m = u.match(/(20\d\d)-01-01/) ?? u.match(/fromdate=(\d+)/); return m[1].length === 4 ? Number(m[1]) : new Date(Number(m[1]) * 1000).getUTCFullYear(); };
+  const server = http.createServer((req, res) => {
+    const u = decodeURIComponent(req.url); seen.push(u);
+    const json = (o) => { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(o)); };
+    if (u.startsWith('/wiki?')) return json(['x', ['Vector database']]);
+    if (u.startsWith('/pv/')) return json({ items: Array.from({ length: 4 }, (_, i) => ({ timestamp: `${end - 3 + i}010100`, views: 100 * 2 ** i })) });
+    if (u.startsWith('/hn/')) { const y = new Date(Number(u.match(/created_at_i>=(\d+)/)[1]) * 1000).getUTCFullYear(); return json({ nbHits: y - (end - 6) }); }
+    if (u.startsWith('/gh/')) { const y = yearOf(u); return json({ total_count: u.includes('"vector database"') ? 10 * (y - end + 6) : 1e6 }); }
+    if (u.startsWith('/se/questions')) { const y = yearOf(u); return json({ total: 1e6 / 2 ** (y - end + 6) }); } // the whole site halves every year
+    if (u.startsWith('/se/search')) { const y = yearOf(u); return json({ total: 1000 / 2 ** (y - end + 6) * 1.5 ** (y - end + 6) }); } // topic falls slower than the site
+    if (u.startsWith('/oa/')) return json({ group_by: [{ key: String(end), count: 50 }, { key: String(end - 3), count: 50 }] });
+    res.writeHead(404); res.end();
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  const b = `http://127.0.0.1:${server.address().port}`;
+  const dir = tmp();
+  const env = { IE_WIKI_API: `${b}/wiki`, IE_PAGEVIEWS_API: `${b}/pv`, IE_HN_API: `${b}/hn`, IE_GITHUB_API: `${b}/gh`, IE_STACK_API: `${b}/se`, IE_OPENALEX_API: `${b}/oa`, IE_CACHE: path.join(dir, 'cache') };
+  try {
+    const r = await nodeAsync([path.join(KIT, 'skills/enhance-research/scripts/trends.mjs'), 'vector database', '--json'], { env });
+    assert.equal(r.status, 0, r.stderr);
+    const res = JSON.parse(r.stdout); const by = Object.fromEntries(res.results.map((x) => [x.source, x]));
+    assert.equal(by.wikipedia.note, 'article "Vector database"'); assert.equal(by.wikipedia.direction, 'surging');
+    assert.equal(by.stackoverflow.basis, 'share of all new questions');
+    assert.ok(by.stackoverflow.series[end] < by.stackoverflow.series[end - 3], 'raw count falls');
+    assert.equal(by.stackoverflow.direction, 'surging', 'but its share of a shrinking site grows 50%/yr');
+    assert.equal(by.openalex.direction, 'flat');
+    assert.ok(seen.some((u) => u.includes('"vector database"')), 'multi-word topic searched as a phrase');
+    assert.equal(res.verdict, 'rising interest');
+    const again = await nodeAsync([path.join(KIT, 'skills/enhance-research/scripts/trends.mjs'), 'vector database', '--json', '--sources', 'stackoverflow'], { env });
+    assert.equal(again.status, 0);
+    assert.equal(seen.filter((u) => u.startsWith('/se/questions')).length, 6, 'site totals for past years are cached');
+  } finally { server.close(); }
+});
+
+test('voice: signal tagging, per-post themes, group cap, dedupe, entity decoding, concentration warning', () => {
+  const doc = (url, text, group, weight = 1) => ({ source: 'GitHub issue', url, text, group, weight });
+  const docs = [
+    ...Array.from({ length: 6 }, (_, i) => doc(`https://g/spam/${i}`, `Problem ${i}: freelancers can't reconcile invoices manually every month, it is tedious.`, 'repo/spam', 5)),
+    doc('https://hn/1', 'I hate manually entering data into spreadsheets for invoices, it is so tedious and slow.', undefined),
+    doc('https://hn/2', 'We switched from QuickBooks to a spreadsheet because the subscription was too expensive per month.', undefined),
+    doc('https://hn/3', 'Is there any tool that does this without manually entering data? I would pay for it.', undefined),
+    doc('https://hn/4', 'Is there any tool that does this without manually entering data? I would pay for it.', undefined),
+  ];
+  const kept = V.capGroups(docs);
+  assert.equal(kept.filter((d) => d.group === 'repo/spam').length, 3, 'max 3 posts per repository');
+  assert.equal(kept.filter((d) => d.url.startsWith('https://hn/3') || d.url.startsWith('https://hn/4')).length, 1, 'exact duplicates dropped');
+  const r = V.extract(kept, 'invoices');
+  assert.ok(r.counts.pain > 0 && r.counts.wish > 0 && r.counts.workaround > 0 && r.counts.price > 0 && r.counts.switching > 0, JSON.stringify(r.counts));
+  const theme = r.themes.find((t) => t.theme === 'manually entering');
+  assert.ok(theme && theme.posts === 2, `themes count distinct posts: ${JSON.stringify(r.themes.slice(0, 5))}`);
+  assert.ok(!r.themes.some((t) => /invoices/.test(t.theme)), 'query words are not themes');
+  assert.ok(r.hits.every((h) => h.excerpt.split(/\s+/).length <= 26), 'excerpts are short');
+  assert.equal(V.clean('**Pain / stakes:** It&#x27;s frustrating that exports break &#x2F; fail every week. https://spam.example/x'), "It's frustrating that exports break / fail every week.");
+});
+
+test('economics: unit economics, bottom-up size, PMF interval, experiment sizes match the formulas', () => {
+  const u = E.unit({ price: 29, grossMargin: 0.8, churn: 0.03, cac: 150 });
+  assert.equal(u.ltv, 773.33); assert.equal(u.ltvToCac, 5.16); assert.equal(u.paybackMonths, 6.47); assert.match(u.verdict, /healthy/);
+  assert.match(E.unit({ price: 10, grossMargin: 0.5, churn: 0.2, cac: 100 }).verdict, /loses money/);
+  assert.throws(() => E.unit({ price: 1, grossMargin: 1, churn: 3, cac: 1 }), /monthly churn/);
+  const s = E.size({ buyers: 120000, price: 348, reachable: 0.3, share: 0.05 });
+  assert.deepEqual([s.tam, s.sam, s.som, s.customersAtSom], [41760000, 12528000, 626400, 1800]);
+  const p = E.pmf({ very: 42, somewhat: 35, not: 23 });
+  assert.deepEqual(p.ci95, [0.328, 0.518]); assert.match(p.verdict, /borderline/);
+  assert.match(E.pmf({ very: 300, somewhat: 100, not: 100 }).verdict, /product-market fit signal/);
+  assert.equal(E.experiment({ baseline: 0.02, target: 0.04 }).perArm, 1141);
+  assert.equal(E.experiment({ expected: 0.06, threshold: 0.03, trafficPerDay: 100 }).visitors, 241);
+  assert.throws(() => E.experiment({}), /needs/);
+  assert.ok(Math.abs(E.z(0.975) - 1.959964) < 1e-5);
+});
+
+test('economics: Van Westendorp finds the textbook crossing points and rejects inconsistent answers', () => {
+  // Respondents spread evenly; each answers 0.5× / 1× / 1.6× / 2.4× of a personal reference price 8..16.
+  const rows = Array.from({ length: 81 }, (_, i) => { const b = 8 + i * 0.1; return { tooCheap: b * 0.5, cheap: b, expensive: b * 1.6, tooExpensive: b * 2.4 }; });
+  const vw = E.vanWestendorp([...rows, { tooCheap: 9, cheap: 5, expensive: 6, tooExpensive: 7 }]);
+  assert.equal(vw.respondents, 81); assert.equal(vw.dropped, 1);
+  assert.ok(vw.pointOfMarginalCheapness < vw.optimalPricePoint || vw.optimalPricePoint < vw.indifferencePricePoint);
+  assert.ok(vw.acceptableRange[0] < vw.indifferencePricePoint && vw.indifferencePricePoint < vw.acceptableRange[1]);
+  assert.ok(Math.abs(vw.indifferencePricePoint - 15.1) < 0.6, `IPP ${vw.indifferencePricePoint}: where 'cheap' and 'expensive' shares cross`);
+  assert.throws(() => E.vanWestendorp(rows.slice(0, 10)), /at least 20/);
+  const dir = tmp();
+  fs.writeFileSync(path.join(dir, 's.csv'), 'Too cheap,Cheap,Expensive,Too expensive\n' + rows.map((r) => [r.tooCheap, r.cheap, r.expensive, r.tooExpensive].join(',')).join('\n'));
+  const x = node([CLI, 'economics', 'vw', '--csv', path.join(dir, 's.csv'), '--json']);
+  assert.equal(x.status, 0, x.stderr); assert.equal(JSON.parse(x.stdout).respondents, 81);
+});
+
+test('score robustness: a dominant idea wins every weighting; near-ties split; RANKING.md reports it', () => {
+  const mk = (id, v, over = {}) => ({ id, name: id, scores: { ...Object.fromEntries(Object.keys(WEIGHTS).map((k) => [k, v])), ...over } });
+  const dom = robustness([mk('A', 5), mk('B', 3), mk('C', 2)]);
+  assert.equal(dom.A, 1);
+  const split = robustness([mk('A', 4, { market: 5, timeToValue: 3 }), mk('B', 4, { market: 3, timeToValue: 5 })]);
+  assert.ok(split.A > 0.2 && split.B > 0.2, JSON.stringify(split));
+  assert.deepEqual(robustness([mk('A', 4, { market: 5, timeToValue: 3 }), mk('B', 4, { market: 3, timeToValue: 5 })]), split, 'seeded: reproducible');
+  const dir = tmp();
+  fs.writeFileSync(path.join(dir, 'ideas.json'), JSON.stringify([mk('A', 4, { market: 5, timeToValue: 3 }), mk('B', 4, { market: 3, timeToValue: 5 })]));
+  const r = node([CLI, 'score', path.join(dir, 'ideas.json'), '--out', dir]);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(fs.readFileSync(path.join(dir, 'RANKING.md'), 'utf8'), /## Robustness[\s\S]*Close call/);
+});
+
+test('evals well formed; plugin manifests agree with package.json; entry lists every skill; orchestrator routes to all', () => {
+  const e = JSON.parse(fs.readFileSync(path.join(KIT, 'evals/cases.json'), 'utf8'));
+  const ids = new Set();
+  for (const c of e.cases) { assert.ok(c.id && !ids.has(c.id)); ids.add(c.id); assert.ok(c.prompt && c.graders.length >= 2 && c.expected, c.id); }
+  assert.ok(e.cases.some((c) => c.kind === 'negative'));
+  const pkg = JSON.parse(fs.readFileSync(path.join(KIT, 'package.json'), 'utf8'));
+  const claude = JSON.parse(fs.readFileSync(path.join(KIT, '.claude-plugin/plugin.json'), 'utf8'));
+  const codex = JSON.parse(fs.readFileSync(path.join(KIT, '.codex-plugin/plugin.json'), 'utf8'));
+  assert.equal(codex.name, claude.name); assert.equal(claude.version, pkg.version); assert.equal(codex.version, pkg.version);
+  const entry = fs.readFileSync(path.join(KIT, 'adapters/entry.md'), 'utf8');
+  const orch = fs.readFileSync(path.join(KIT, 'skills/enhance/SKILL.md'), 'utf8');
+  for (const s of fs.readdirSync(path.join(KIT, 'skills'))) { assert.ok(entry.includes(`skills/${s}/SKILL.md`), `entry.md misses ${s}`); if (s !== 'enhance') assert.ok(orch.includes(s), `orchestrator misses ${s}`); }
+});
+
 if (process.env.LIVE === '1' || process.argv.includes('--live')) {
   test('LIVE: real APIs return relevant results for a sample query', async () => {
     const run = await research('solar water pump', { sources: ['github', 'hn', 'arxiv', 'openalex', 'wikipedia'], limit: 3 });

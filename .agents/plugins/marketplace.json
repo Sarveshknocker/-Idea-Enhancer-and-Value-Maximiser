@@ -1,0 +1,21 @@
+{
+  "name": "idea-enhancer",
+  "interface": {
+    "displayName": "Idea Enhancer"
+  },
+  "plugins": [
+    {
+      "name": "idea-enhancer",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

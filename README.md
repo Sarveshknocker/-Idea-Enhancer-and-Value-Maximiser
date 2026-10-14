@@ -21,6 +21,9 @@ Works with **Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, Wind
 | "You could charge a subscription" | **Value engineering**: payer, value metric, Free→Pro→Enterprise packaging, bottom-up TAM/SAM/SOM, unit economics, moats, transparent value scoring |
 | Uncritical enthusiasm | **Red-team**: riskiest assumptions, pre-mortem, legal/regulatory/ethical check, experiments you can run this week |
 | Made-up numbers | **Graded evidence** (A–D) with links for every claim; assumptions labelled |
+| "People will love it" | **Demand evidence**: real pains, workarounds, price objections and switching stories mined from public discussions, plus multi-year interest trends normalised for platform growth |
+| Back-of-envelope maths | **Computed**: unit economics, bottom-up market size, Van Westendorp price range, product-market-fit score with its interval, and experiment sample sizes |
+| A ranking that hides its taste | **Robustness**: how often the top idea still wins when every weight moves ±30% |
 
 ## Use it
 
@@ -59,7 +62,11 @@ More prompts: [prompts/README.md](prompts/README.md).
 node bin/enhancer.mjs research "cold chain iot" --limit 10                  # OSINT collector
 node bin/enhancer.mjs research --queries-file .enhancer/queries.txt --tag landscape
 node bin/enhancer.mjs connect "late payments for freelancers" 10            # cross-domain bridges
-node bin/enhancer.mjs score .enhancer/ideas.json                             # value ranking
+node bin/enhancer.mjs score .enhancer/ideas.json                             # value ranking + robustness
+node bin/enhancer.mjs voice "invoice software freelancers"                   # pains, wishes, workarounds, prices
+node bin/enhancer.mjs trends "e-invoicing"                                   # interest over 6 years
+node bin/enhancer.mjs economics unit --price 29 --gross-margin 0.8 --churn 0.03 --cac 150
+node bin/enhancer.mjs economics experiment --expected 0.06 --threshold 0.03 # landing-page test size
 ```
 Optional environment variables:
 - `GITHUB_TOKEN`: higher GitHub rate limit.
@@ -70,13 +77,15 @@ Optional environment variables:
 ```
 skills/
   enhance/              orchestrator: autonomous 6-phase workflow, integrity rules, framing toolkit
-  enhance-research/     OSINT playbook, evidence grading, zero-dependency collector (10+ sources)
+  enhance-research/     OSINT playbook, evidence grading, collector (10+ sources), voice-of-customer miner, demand trends
   enhance-connect/      cross-domain bridge engine (40 domains × 24 principles × 20 enablers × 22 mechanisms), 10 enhancement lenses, simplicity filter
-  enhance-value/        monetization models library, pricing, bottom-up market sizing, moats, value scorer
+  enhance-value/        monetization models, pricing, market sizing, moats, value scorer + robustness, economics calculator
   enhance-validate/     pre-mortem, assumption map, legal/regulatory/ethics checklist, experiment design
   enhance-deliver/      Value Blueprint template + one-pager
 agents/                 osint-researcher, cross-domain-inventor, value-strategist, skeptic
 bin/enhancer.mjs        installer + CLI
+evals/                  with-kit vs baseline cases judged blind
+research/BENCHMARK.md   what we learned from leading open-source projects
 tests/run.mjs           offline tests (mocked network) + optional live API test
 ```
 
@@ -84,11 +93,18 @@ tests/run.mjs           offline tests (mocked network) + optional live API test
 - **Research quality depends on sources and the AI's web access.** Free APIs have rate limits, and some platforms (X, Reddit, patents) need web search or credentials. The blueprint lists which sources were unavailable.
 - **Numbers in the blueprint are only as good as their sources.** Every figure is linked or labelled as an assumption. Validate the riskiest ones with the experiments it proposes before investing.
 - **It helps you decide; it doesn't replace talking to customers.** The first experiment it recommends is usually exactly that.
+- **Mined customer voice is a technical sample.** Hacker News, GitHub and Stack Overflow over-represent developers and early adopters; the trends are proxies for interest (evidence grade C), not proof that anyone will pay.
 - **Responsible use.** It researches topics, markets and public projects, not private individuals, and flags harmful or non-compliant ideas.
+
+## Credits
+Ideas adapted from open-source projects and methods are listed in [CREDITS.md](CREDITS.md); the comparison is in [research/BENCHMARK.md](research/BENCHMARK.md).
 
 ## Related kits
 - [3D-animated-web-developer](https://github.com/Sarveshknocker/3D-animated-web-developer): build a premium 3D/animated site for the concept.
 - [The-protectors-](https://github.com/Sarveshknocker/The-protectors-): security-harden what you build.
+- [The-Ai-Maker-](https://github.com/Sarveshknocker/The-Ai-Maker-): design the AI system behind the concept.
+- [The-Hardware-engineering](https://github.com/Sarveshknocker/The-Hardware-engineering): design the device.
+- [The-Reconstructor](https://github.com/Sarveshknocker/The-Reconstructor): understand an existing product's codebase.
 
 ## Develop
 ```bash

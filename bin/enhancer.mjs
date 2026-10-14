@@ -153,6 +153,9 @@ switch (cmd) {
   case 'research': runScript('skills/enhance-research/scripts/research.mjs', rest); break;
   case 'connect': runScript('skills/enhance-connect/scripts/connect.mjs', rest); break;
   case 'score': runScript('skills/enhance-value/scripts/score.mjs', rest); break;
+  case 'voice': runScript('skills/enhance-research/scripts/voice.mjs', rest); break;
+  case 'trends': runScript('skills/enhance-research/scripts/trends.mjs', rest); break;
+  case 'economics': runScript('skills/enhance-value/scripts/economics.mjs', rest); break;
   default:
     console.log(`Idea Enhancer & Value Maximiser — turn any idea or problem into a premium, monetizable concept
 
@@ -164,5 +167,8 @@ Commands:
            [--queries-file f] [--sources github,hn,reddit,arxiv,openalex,stackoverflow,huggingface,hf-datasets,npm,wikipedia,news]
            [--limit 8] [--tag name]
   connect  "<problem>" [n] cross-domain bridges (domain × principle × enabler × business mechanism) [--json]
-  score    [ideas.json]    rank enhancements with the value rubric → .enhancer/RANKING.md`);
+  score    [ideas.json]    rank enhancements with the value rubric + robustness → .enhancer/RANKING.md
+  voice    "<words>"       pains, wishes, workarounds, prices from HN / GitHub issues / Stack Overflow → VOICE-*.md
+  trends   "<topic>"       yearly interest signals with normalised growth → TRENDS-*.md
+  economics <unit|size|vw|pmf|experiment> [--options]   unit economics, market size, Van Westendorp, PMF, sample sizes`);
 }

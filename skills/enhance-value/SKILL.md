@@ -15,9 +15,16 @@ Use `references/monetization-models.md`. For the top candidates decide:
 
 ## 2. Market sizing: bottom-up (`references/market-sizing.md`)
 `reachable customers × adoption rate × annual price`, with every input sourced or labelled as an assumption. Show TAM → SAM → SOM (3-year). No top-down "1 % of a $50B market" reasoning.
+```bash
+node <kit>/skills/enhance-value/scripts/economics.mjs size --buyers 120000 --price 348 --reachable 0.3 --share 0.05
+```
 
 ## 3. Unit economics sketch
-CAC (by channel), ARPU/ACV, gross margin (include AI/API/hardware costs), payback period, LTV:CAC. Flag if LTV:CAC < 3 or payback > 18 months.
+CAC (by channel), ARPU/ACV, gross margin (include AI/API/hardware costs), payback period, LTV:CAC:
+```bash
+node <kit>/skills/enhance-value/scripts/economics.mjs unit --price 29 --gross-margin 0.8 --churn 0.03 --cac 150
+```
+Flag LTV:CAC < 3 or payback > 12–18 months (common heuristics; say so). If you have pricing-survey answers, compute the acceptable price range with Van Westendorp: `economics.mjs vw --csv survey.csv` (columns too_cheap, cheap, expensive, too_expensive; ≥ 20 consistent answers). Stated willingness to pay is optimistic: confirm with pre-orders or a paid pilot.
 
 ## 4. Moat (`references/moats.md`)
 Which moat compounds with usage? Proprietary data, network effects, switching costs, brand/trust, distribution partnerships, regulatory licenses, cost advantage, community. Design at least one into v1.
@@ -34,7 +41,7 @@ Scores 1–5 (risk: 5 = low risk; simplicity: 5 = very simple). Justify each sco
 ```bash
 node <kit>/skills/enhance-value/scripts/score.mjs .enhancer/ideas.json
 ```
-→ `.enhancer/RANKING.md` with value (0–100), tier (Premium bet / Strong / Promising / Park) and gates (weak evidence, unclear WTP, too complex, high risk).
+→ `.enhancer/RANKING.md` with value (0–100), tier (Premium bet / Strong / Promising / Park), gates (weak evidence, unclear WTP, too complex, high risk) and a **robustness** line: how often each idea wins when every weight moves ±30%. Below 70% for the winner, it is a close call: validate the top two before committing.
 
 ## 6. Synthesise the premium concept
 Combine the top-ranked enhancements into **one coherent offer**: a simple free core that solves the main pain, plus premium layers that compound value (data, automation, network). Each element must reinforce the others. Write its value proposition as: *For [segment] who [pain], [name] is a [category] that [key benefit]. Unlike [alternative], it [differentiator].*
