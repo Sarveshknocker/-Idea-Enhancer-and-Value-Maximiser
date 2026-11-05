@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 — 2026-11-05
+Fixes from an external review.
+- **I-1: themes were word-pair noise labelled grade B.** Themes are now 2-3-word phrases (stop words break phrases), need 3+ posts from 2+ different threads, merge overlapping fragments, skip issue-template boilerplate and carry a source quote. Off-topic posts (not mentioning most query words) are dropped, and the evidence grade is computed from independent sources (D/C/B-C).
+- **I-2:** `voice` always prints its summary and output path, and exits 1 when no posts are found.
+- **I-4:** `economics` prints real usage instead of "(see header)", rejects unknown flags with a did-you-mean, and never prints NaN.
+
 ## 0.3.0 — 2026-11-05
 Safety release, from an external review (P0 blockers).
 - **The installer can no longer delete your files.** New shared `bin/kit-installer.mjs` (the same file in all of Sarvesh's kits). `--kit-dir` must be a new sub-folder of the project. A folder the kit did not create is never deleted. Only paths recorded in the manifest *and* produced by this kit are removed, so a tampered manifest cannot widen the delete. Existing files are never overwritten: `--force` backs them up to `<kit-dir>/backup/` and `remove` restores them. Covered by `tests/installer.mjs` (12 cases, run by `npm test`).

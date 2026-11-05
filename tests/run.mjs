@@ -221,6 +221,7 @@ test('voice: signal tagging, per-post themes, group cap, dedupe, entity decoding
     doc('https://hn/2', 'We switched from QuickBooks to a spreadsheet because the subscription was too expensive per month.', undefined),
     doc('https://hn/3', 'Is there any tool that does this without manually entering data? I would pay for it.', undefined),
     doc('https://hn/4', 'Is there any tool that does this without manually entering data? I would pay for it.', undefined),
+    doc('https://hn/5', 'Honestly I am sick of manually entering receipts every single week, it wastes hours.', undefined),
   ];
   const kept = V.capGroups(docs);
   assert.equal(kept.filter((d) => d.group === 'repo/spam').length, 3, 'max 3 posts per repository');
@@ -228,10 +229,33 @@ test('voice: signal tagging, per-post themes, group cap, dedupe, entity decoding
   const r = V.extract(kept, 'invoices');
   assert.ok(r.counts.pain > 0 && r.counts.wish > 0 && r.counts.workaround > 0 && r.counts.price > 0 && r.counts.switching > 0, JSON.stringify(r.counts));
   const theme = r.themes.find((t) => t.theme === 'manually entering');
-  assert.ok(theme && theme.posts === 2, `themes count distinct posts: ${JSON.stringify(r.themes.slice(0, 5))}`);
+  assert.ok(theme && theme.posts === 3 && theme.groups === 3, `themes count distinct posts: ${JSON.stringify(r.themes.slice(0, 5))}`);
+  assert.ok(theme.example?.url, 'each theme links to a source excerpt');
   assert.ok(!r.themes.some((t) => /invoices/.test(t.theme)), 'query words are not themes');
   assert.ok(r.hits.every((h) => h.excerpt.split(/\s+/).length <= 26), 'excerpts are short');
   assert.equal(V.clean('**Pain / stakes:** It&#x27;s frustrating that exports break &#x2F; fail every week. https://spam.example/x'), "It's frustrating that exports break / fail every week.");
+});
+
+test('voice: themes are real phrases from independent threads, not word-pair chains; evidence grade follows the sources', () => {
+  // The review's case: one sentence became "cannot require · require user · user registration · registration prior · …"
+  const sentence = 'It is so frustrating that admins cannot require user registration prior to allowing access to the wiki.';
+  const doc = (url, group) => ({ source: 'GitHub issue', url, text: sentence, group, weight: 1 });
+  const sameThread = V.extract([doc('https://g/1', 't/1'), doc('https://g/2', 't/1'), doc('https://g/3', 't/1')], 'wiki');
+  assert.deepEqual(sameThread.themes, [], 'repetition inside one thread is not a recurring theme');
+  const spread = V.extract([doc('https://g/1', 't/1'), doc('https://g/2', 't/2'), doc('https://g/3', 't/3')], 'wiki');
+  assert.deepEqual(spread.themes.map((t) => t.theme), ['require user registration'], 'fragments merge into the longest phrase; stop words break phrases');
+  assert.ok(!spread.themes.some((t) => /cannot|prior|allowing/.test(t.theme)));
+  // Search APIs match any word anywhere: a Go-generics thread is not about a meeting notes app.
+  assert.equal(V.onTopic({ text: 'Methods cannot declare type parameters; the app crashes.' }, 'meeting notes app'), false);
+  assert.equal(V.onTopic({ text: 'Our meeting notes get lost between apps every week.' }, 'meeting notes app'), true);
+  const tpl = (url, group) => ({ source: 'GitHub issue', url, group, weight: 1, text: 'This is a feature request: the export is so frustrating to use every day.' });
+  assert.ok(!V.extract([tpl('u1', 'a'), tpl('u2', 'b'), tpl('u3', 'c')], 'x').themes.some((t) => t.theme === 'feature request'), 'template boilerplate is not a theme');
+  assert.equal(V.evidenceGrade(1).grade, 'D');
+  assert.equal(V.evidenceGrade(5).grade, 'C');
+  assert.equal(V.evidenceGrade(12).grade, 'B–C');
+  const md = V.toMarkdown({ query: 'q', generatedAt: new Date().toISOString(), documents: 1, groups: 1, evidence: V.evidenceGrade(1), errors: [], warnings: [], hits: [], counts: { pain: 0, wish: 0, workaround: 0, price: 0, switching: 0 }, themes: [] });
+  assert.match(md, /Evidence grade D/);
+  assert.doesNotMatch(md, /grade B/);
 });
 
 test('economics: unit economics, bottom-up size, PMF interval, experiment sizes match the formulas', () => {

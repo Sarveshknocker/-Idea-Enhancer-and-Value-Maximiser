@@ -121,19 +121,42 @@ function parseCsv(file) {
 
 // Run as a CLI? Compare real paths: macOS temp dirs are symlinks (/var → /private/var), Windows has 8.3 short names.
 const realPath = (p) => { try { return realpathSync.native(p); } catch { return path.resolve(p); } };
+// Flags each command accepts (camelCase); anything else is a typo and is rejected instead of silently ignored.
+export const FLAGS = {
+  unit: ['price', 'grossMargin', 'churn', 'cac'], size: ['buyers', 'price', 'reachable', 'share'], vw: ['csv'],
+  pmf: ['very', 'somewhat', 'not'], experiment: ['baseline', 'target', 'trafficPerDay', 'expected', 'threshold', 'alpha', 'power'],
+};
+const kebab = (k) => `--${k.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`;
+const distance = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
+export function checkFlags(cmd, o) {
+  for (const k of Object.keys(o)) {
+    if (k === 'json' || FLAGS[cmd].includes(k)) continue;
+    const near = [...FLAGS[cmd]].sort((a, b) => distance(k, a) - distance(k, b))[0];
+    throw new Error(`unknown option ${kebab(k)} for "${cmd}"${near && distance(k, near) <= Math.max(3, near.length / 2) ? `: did you mean ${kebab(near)}?` : ''}\n${usage(cmd)}`);
+  }
+}
+/** Usage lines come from this file's header, so the help can never drift from the documentation. */
+export function usage(cmd) {
+  const lines = fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//   node economics.mjs'));
+  return (cmd ? lines.filter((l) => l.includes(`economics.mjs ${cmd} `)) : lines).map((l) => l.replace(/^\/\/ {3}/, '  ')).join('\n');
+}
+
 if (process.argv[1] && realPath(process.argv[1]).toLowerCase() === realPath(fileURLToPath(import.meta.url)).toLowerCase()) {
   const [cmd, ...rest] = process.argv.slice(2);
+  if (!FLAGS[cmd]) { console.error(`usage:\n${usage()}`); process.exit(2); }
   const o = {};
   for (let i = 0; i < rest.length; i++) if (rest[i].startsWith('--')) { const k = rest[i].slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase()); const v = rest[i + 1]; o[k] = v !== undefined && !v.startsWith('--') ? (isNaN(Number(v)) ? v : Number(v)) : true; }
   const json = o.json === true;
   try {
+    checkFlags(cmd, o);
     let res;
     if (cmd === 'unit') res = unit(o);
     else if (cmd === 'size') res = size(o);
-    else if (cmd === 'vw') { if (!o.csv) throw new Error('vw needs --csv file'); res = vanWestendorp(parseCsv(o.csv)); }
+    else if (cmd === 'vw') { if (typeof o.csv !== 'string') throw new Error('vw needs --csv file'); res = vanWestendorp(parseCsv(o.csv)); }
     else if (cmd === 'pmf') res = pmf(o);
-    else if (cmd === 'experiment') res = experiment(o);
-    else { console.error('usage: economics.mjs <unit|size|vw|pmf|experiment> [--options]  (see header)'); process.exit(2); }
+    else res = experiment(o);
+    const bad = Object.entries(res).find(([, v]) => typeof v === 'number' && !Number.isFinite(v));
+    if (bad) throw new Error(`could not compute ${bad[0]} from these inputs (got ${bad[1]}); check the values\n${usage(cmd)}`);
     if (json) console.log(JSON.stringify(res, null, 2));
     else for (const [k, v] of Object.entries(res)) console.log(`${k.padEnd(28)} ${Array.isArray(v) ? v.join(' – ') : typeof v === 'number' && /^(tam|sam|som|ltv)$/i.test(k) ? money(v) : v}`);
   } catch (e) { console.error(e.message); process.exit(1); }
