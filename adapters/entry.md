@@ -4,7 +4,7 @@ This workspace has the **Idea Enhancer & Value Maximiser** kit at `{{KIT}}/`. Wh
 
 | Task | Open and follow |
 |---|---|
-| Full autonomous enhancement (end to end) | `{{KIT}}/skills/enhance/SKILL.md` |
+| Full autonomous enhancement (end to end) | `{{KIT}}/skills/idea-enhancer/SKILL.md` |
 | OSINT research (GitHub, Reddit, X, HN, papers, patents, open data) | `{{KIT}}/skills/enhance-research/SKILL.md` |
 | Cross-domain creative connections + simplicity filter | `{{KIT}}/skills/enhance-connect/SKILL.md` |
 | Monetization, pricing, market sizing, moats, value scoring | `{{KIT}}/skills/enhance-value/SKILL.md` |

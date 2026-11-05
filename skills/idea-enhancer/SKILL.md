@@ -1,5 +1,5 @@
 ---
-name: enhance
+name: idea-enhancer
 description: Idea Enhancer & Value Maximiser — turn ANY idea or problem (any category: tech, business, social, hardware, health, education, agriculture, creative, personal) into a premium, highly monetizable concept. Researches open-source intelligence (GitHub, Reddit, X, Hacker News, research papers, open datasets, patents, specialist sites), connects ideas across unrelated domains, adds the most creative high-value enhancements, keeps the solution simple, stress-tests it, and delivers a Value Blueprint. Use when the user shares an idea or problem and wants it improved, validated, monetized, or solved in the most effective way.
 ---
 

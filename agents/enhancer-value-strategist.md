@@ -1,5 +1,5 @@
 ---
-name: value-strategist
+name: enhancer-value-strategist
 description: Business-model and pricing strategist. Turns candidate enhancements into a premium, monetizable concept with packaging, bottom-up market sizing, unit economics, moat and go-to-market, and scores candidates with the value rubric.
 tools: Read, Grep, Glob, Bash, Write
 ---

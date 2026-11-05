@@ -1,5 +1,5 @@
 ---
-name: skeptic
+name: enhancer-skeptic
 description: Red-team reviewer who stress-tests an enhanced idea — riskiest assumptions, pre-mortem, competitor response, legal/regulatory/ethical issues — and designs cheap validation experiments. Use before delivering the blueprint.
 tools: Read, Grep, Glob, Bash, WebSearch, Write
 ---

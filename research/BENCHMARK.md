@@ -22,6 +22,6 @@ here is original (see [CREDITS.md](../CREDITS.md)).
   noise ("offer tracks", "#x2f #x2f") into real themes ("manually entering data", "per month", "free tier").
 
 ## Not adopted, and why
-- Persona "councils" of famous people: entertaining, but this kit's job is evidence; the `skeptic` agent already plays
+- Persona "councils" of famous people: entertaining, but this kit's job is evidence; the `enhancer-skeptic` agent already plays
   the dissenting role without simulating real individuals.
 - Scraping review sites behind logins or against terms: only public APIs and normal web search are used.

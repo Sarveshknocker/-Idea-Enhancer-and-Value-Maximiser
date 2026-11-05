@@ -1,6 +1,6 @@
 # Ready-to-paste prompts
 
-Agentic tools read the kit automatically (open this repo, or run `init` in your folder). For **chat-only AIs** (ChatGPT, Gemini web, Claude.ai), attach `skills/enhance/SKILL.md` plus the sub-skill files and, ideally, a research file you generated with `node bin/enhancer.mjs research "<keywords>"`.
+Agentic tools read the kit automatically (open this repo, or run `init` in your folder). For **chat-only AIs** (ChatGPT, Gemini web, Claude.ai), attach `skills/idea-enhancer/SKILL.md` plus the sub-skill files and, ideally, a research file you generated with `node bin/enhancer.mjs research "<keywords>"`.
 
 ---
 

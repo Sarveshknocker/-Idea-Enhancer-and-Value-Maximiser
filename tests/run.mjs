@@ -122,8 +122,8 @@ test('init → update → remove round-trip keeps user content intact', () => {
   assert.equal(r.status, 0, r.stderr);
   const agents = fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8');
   assert.match(agents, /Keep this\./);
-  assert.match(agents, /\.enhancer-kit\/skills\/enhance\/SKILL\.md/);
-  for (const f of ['CLAUDE.md', 'GEMINI.md', '.github/copilot-instructions.md', '.cursor/rules/idea-enhancer.mdc', '.windsurf/rules/idea-enhancer.md', '.clinerules/idea-enhancer.md', '.claude/skills/enhance/SKILL.md', '.claude/agents/osint-researcher.md', '.enhancer-kit/skills/enhance-research/scripts/research.mjs']) {
+  assert.match(agents, /\.enhancer-kit\/skills\/idea-enhancer\/SKILL\.md/);
+  for (const f of ['CLAUDE.md', 'GEMINI.md', '.github/copilot-instructions.md', '.cursor/rules/idea-enhancer.mdc', '.windsurf/rules/idea-enhancer.md', '.clinerules/idea-enhancer.md', '.claude/skills/idea-enhancer/SKILL.md', '.claude/agents/enhancer-osint-researcher.md', '.enhancer-kit/skills/enhance-research/scripts/research.mjs']) {
     assert.ok(fs.existsSync(path.join(dir, f)), `missing ${f}`);
   }
   r = node([CLI, 'update', dir]);
@@ -289,8 +289,8 @@ test('evals well formed; plugin manifests agree with package.json; entry lists e
   const codex = JSON.parse(fs.readFileSync(path.join(KIT, '.codex-plugin/plugin.json'), 'utf8'));
   assert.equal(codex.name, claude.name); assert.equal(claude.version, pkg.version); assert.equal(codex.version, pkg.version);
   const entry = fs.readFileSync(path.join(KIT, 'adapters/entry.md'), 'utf8');
-  const orch = fs.readFileSync(path.join(KIT, 'skills/enhance/SKILL.md'), 'utf8');
-  for (const s of fs.readdirSync(path.join(KIT, 'skills'))) { assert.ok(entry.includes(`skills/${s}/SKILL.md`), `entry.md misses ${s}`); if (s !== 'enhance') assert.ok(orch.includes(s), `orchestrator misses ${s}`); }
+  const orch = fs.readFileSync(path.join(KIT, 'skills/idea-enhancer/SKILL.md'), 'utf8');
+  for (const s of fs.readdirSync(path.join(KIT, 'skills'))) { assert.ok(entry.includes(`skills/${s}/SKILL.md`), `entry.md misses ${s}`); if (s !== 'idea-enhancer') assert.ok(orch.includes(s), `orchestrator misses ${s}`); }
 });
 
 if (process.env.LIVE === '1' || process.argv.includes('--live')) {

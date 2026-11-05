@@ -82,7 +82,7 @@ skills/
   enhance-value/        monetization models, pricing, market sizing, moats, value scorer + robustness, economics calculator
   enhance-validate/     pre-mortem, assumption map, legal/regulatory/ethics checklist, experiment design
   enhance-deliver/      Value Blueprint template + one-pager
-agents/                 osint-researcher, cross-domain-inventor, value-strategist, skeptic
+agents/                 enhancer-osint-researcher, -cross-domain-inventor, -value-strategist, -skeptic
 bin/enhancer.mjs        installer + CLI
 evals/                  with-kit vs baseline cases judged blind
 research/BENCHMARK.md   what we learned from leading open-source projects

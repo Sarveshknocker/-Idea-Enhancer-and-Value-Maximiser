@@ -1,5 +1,5 @@
 ---
-name: osint-researcher
+name: enhancer-osint-researcher
 description: Open-source intelligence researcher. Given a framed problem, runs the Idea Enhancer collector and web searches (GitHub, Reddit, X, Hacker News, papers, patents, open data, competitor sites) and returns a graded evidence landscape. Use in parallel for different query clusters.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch, Write
 ---

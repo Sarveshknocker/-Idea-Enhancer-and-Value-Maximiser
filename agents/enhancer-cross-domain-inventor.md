@@ -1,5 +1,5 @@
 ---
-name: cross-domain-inventor
+name: enhancer-cross-domain-inventor
 description: Inventor that connects unrelated domains, technologies, business mechanisms and inventive principles to generate creative, high-value, simple enhancements for an idea. Use after research to produce candidate enhancements.
 tools: Read, Grep, Glob, Bash, Write
 ---

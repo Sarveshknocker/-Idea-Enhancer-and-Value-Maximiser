@@ -2,7 +2,7 @@
 
 ## If the user gives you an idea or a problem
 This repository **is** the kit. Treat any idea or problem the user types (any category) as a request to run it:
-open and follow `skills/enhance/SKILL.md` (the orchestrator), which routes to `skills/enhance-research`, `enhance-connect`, `enhance-value`, `enhance-validate` and `enhance-deliver`. Scripts run with Node ≥ 18 from this folder (e.g. `node skills/enhance-research/scripts/research.mjs "<keywords>"`). Write outputs to `.enhancer/`. Work autonomously; record assumptions instead of asking. Never invent sources or numbers.
+open and follow `skills/idea-enhancer/SKILL.md` (the orchestrator), which routes to `skills/enhance-research`, `enhance-connect`, `enhance-value`, `enhance-validate` and `enhance-deliver`. Scripts run with Node ≥ 18 from this folder (e.g. `node skills/enhance-research/scripts/research.mjs "<keywords>"`). Write outputs to `.enhancer/`. Work autonomously; record assumptions instead of asking. Never invent sources or numbers.
 
 Sub-agent briefs (if supported): `agents/`.
 

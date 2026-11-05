@@ -1,6 +1,6 @@
 {
   "name": "idea-enhancer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "repository": "github:Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser",
   "description": "Turns any idea or problem into a premium, highly monetizable concept using open-source intelligence, cross-domain creativity and value engineering — for any AI coding assistant.",
   "type": "module",
@@ -23,7 +23,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node tests/run.mjs",
+    "test": "node tests/run.mjs && node tests/installer.mjs",
     "test:live": "node tests/run.mjs --live"
   },
   "keywords": [
