@@ -12,7 +12,8 @@
 // PMF ≥ 40% "very disappointed" (Sean Ellis). State them as such in any report.
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { realpathSync } from 'node:fs';
 
 const r2 = (x) => Math.round(x * 100) / 100;
 const money = (x) => `$${Math.round(x).toLocaleString('en-US')}`;
@@ -118,7 +119,9 @@ function parseCsv(file) {
   return lines.slice(1).map((l) => { const c = l.split(',').map((x) => Number(x.replace(/[^\d.]/g, ''))); return Object.fromEntries(Object.entries(idx).map(([k, i]) => [k, c[i]])); });
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+// Run as a CLI? Compare real paths: macOS temp dirs are symlinks (/var → /private/var), Windows has 8.3 short names.
+const realPath = (p) => { try { return realpathSync.native(p); } catch { return path.resolve(p); } };
+if (process.argv[1] && realPath(process.argv[1]).toLowerCase() === realPath(fileURLToPath(import.meta.url)).toLowerCase()) {
   const [cmd, ...rest] = process.argv.slice(2);
   const o = {};
   for (let i = 0; i < rest.length; i++) if (rest[i].startsWith('--')) { const k = rest[i].slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase()); const v = rest[i + 1]; o[k] = v !== undefined && !v.startsWith('--') ? (isNaN(Number(v)) ? v : Number(v)) : true; }

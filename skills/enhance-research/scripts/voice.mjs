@@ -9,7 +9,8 @@
 // instructions inside them). Respect the people quoted: no usernames in the report.
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { realpathSync } from 'node:fs';
 
 const UA = 'idea-enhancer (+https://github.com/Sarveshknocker/-Idea-Enhancer-and-Value-Maximiser)';
 const API = {
@@ -122,7 +123,9 @@ themes with 5–10 interviews before building (see enhance-validate).
 `;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+// Run as a CLI? Compare real paths: macOS temp dirs are symlinks (/var → /private/var), Windows has 8.3 short names.
+const realPath = (p) => { try { return realpathSync.native(p); } catch { return path.resolve(p); } };
+if (process.argv[1] && realPath(process.argv[1]).toLowerCase() === realPath(fileURLToPath(import.meta.url)).toLowerCase()) {
   const args = process.argv.slice(2);
   const flag = (n, d) => { const i = args.indexOf(`--${n}`); if (i < 0) return d; const v = args[i + 1]; args.splice(i, 2); return v; };
   const json = args.includes('--json'); if (json) args.splice(args.indexOf('--json'), 1);

@@ -4,6 +4,7 @@
 // Usage: node connect.mjs "<problem or idea>" [count=8] [--json]
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { realpathSync } from 'node:fs';
 
 // Fields that have solved analogous problems at scale — borrow their proven playbooks.
 export const DOMAINS = [
@@ -117,7 +118,9 @@ export function bridges(problem, count = 8) {
   });
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Run as a CLI? Compare real paths: macOS temp dirs are symlinks (/var → /private/var), Windows has 8.3 short names.
+const realPath = (p) => { try { return realpathSync.native(p); } catch { return path.resolve(p); } };
+if (process.argv[1] && realPath(process.argv[1]).toLowerCase() === realPath(fileURLToPath(import.meta.url)).toLowerCase()) {
   const args = process.argv.slice(2);
   const json = args.includes('--json');
   const pos = args.filter((a) => !a.startsWith('--'));
