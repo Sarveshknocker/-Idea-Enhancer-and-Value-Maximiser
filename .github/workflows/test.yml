@@ -10,6 +10,7 @@ permissions:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node: [18, 22]
@@ -19,7 +20,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - run: npm test
+      # On failure the output is also posted as an annotation, which is readable without logging in.
+      - name: npm test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test-output.txt || {
+            msg="$(tail -c 60000 test-output.txt)"; msg="${msg//'%'/'%25'}"; msg="${msg//$'\r'/'%0D'}"; msg="${msg//$'\n'/'%0A'}"
+            echo "::error title=npm test failed (${{ matrix.os }}, node ${{ matrix.node }})::$msg"; exit 1; }
   live:
     runs-on: ubuntu-latest
     continue-on-error: true
